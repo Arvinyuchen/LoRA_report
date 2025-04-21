@@ -1,0 +1,1 @@
+{"rule":"A_INFINITIVE","sentence":"^\\QGeneral Language Understanding Evaluation (GLUE) GLUE is a multitask benchmark and analysis platform for natural language understanding.\\E$"}
