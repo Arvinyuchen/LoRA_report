@@ -26,7 +26,44 @@ class QuickGELU(nn.Module):
 class ResidualAttentionBlock(nn.Module):
     def __init__(self, d_model: int, n_head: int, attn_mask: torch.Tensor = None, r=4, lora_alpha=8):
         super().__init__()
-        self.attn = nn.MultiheadAttention(d_model, n_head, batch_first=True)
+        assert d_model % n_head == 0, "Embedding dimension must be 0 modulo number of heads."
+
+        self.d_model = d_model
+        self.n_head = n_head
+        self.num_heads = d_model // n_head
+
+        self.qkv_proj = LoRALinear(d_model, 3 * d_model)
+        self.out_proj = LoRALinear(d_model, d_model)
+
+        self.ln_1 = LayerNorm(d_model)
+
+        self.mlp= nn.Sequential(OrderedDict([
+            ("c_fc", LoRALinear(d_model, d_model * 4)),
+            ("gelu", QuickGELU()),
+            ("c_proj", LoRALinear(d_model * 4, d_model))
+        ]))
+        self.ln_2 = LayerNorm(d_model)
+        self.attn_mask = attn_mask
+
+        def attention(self, x: torch.Tensor):
+            batch_size, seq_len, _ = x.shape
+            x_norm = self.ln_1(x)
+            qkv = self.qkv_proj(x_norm)
+            q, k, v = qkv.chunk(3, dim=-1)
+            x = x + self.attention(self.ln(x))
+
+
+            x = x + self.mlp(self.ln_2(x))
+            return x
+
+        def forward(self, x: torch.Tensor):
+            x = x + self.atttention(self.ln(1))
+            x = x + self.mlp(self.ln(x))
+            return x 
+
+
+
+
 
         # Inject LoRA into in_proj_weight via MergedLinear
         self.attn_lora = MergedLinear(
@@ -40,9 +77,9 @@ class ResidualAttentionBlock(nn.Module):
 
         self.ln_1 = LayerNorm(d_model)
         self.mlp = nn.Sequential(OrderedDict([
-            ("c_fc", LoRALinear(d_model, d_model * 4, r=r, lora_alpha=lora_alpha, enable_lora=[True], fan_in_fan_out=False)),
+            ("c_fc", LoRALinear(d_model, d_model * 4)),
             ("gelu", QuickGELU()),
-            ("c_proj", LoRALinear(d_model * 4, d_model, r=r, lora_alpha=lora_alpha, enable_lora=[True], fan_in_fan_out=False)),
+            ("c_proj", LoRALinear(d_model * 4, d_model)),
         ]))
         self.ln_2 = LayerNorm(d_model)
         self.attn_mask = attn_mask

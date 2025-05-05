@@ -7,7 +7,6 @@ import clip
 def train(model, train_loader, preprocess, device, optimizer, n_epoch, model_path):
     # training mode
     model.train()
-
     for epoch in range(n_epoch):
         for step, (images, captions) in enumerate(train_loader):
 

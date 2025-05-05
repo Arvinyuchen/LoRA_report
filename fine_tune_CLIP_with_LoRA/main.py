@@ -1,9 +1,11 @@
 import torch
 import os
-from torchvision.datasets import CIFAR100, collate_fn
+from torchvision.datasets import CIFAR100
 from torch.utils.data import DataLoader, dataset
-import dataset
+from dataset import collate_fn, ContrastiveCIFAR
 from model import inject_lora_into_clip
+from torch.optim import AdamW
+from train import train
 
 import clip 
 
@@ -20,22 +22,29 @@ def ft_clip_lora():
     # load dataset and dataloader
     root = os.path.expanduser("~/.cache")
     cifar_train = CIFAR100(root, download=True, train=True)
-    train_ds = dataset.ContrastiveCIFAR(cifar_train)
-    train_loader = DataLoader(train_ds, batch_size, shuffle=True, num_workers=2)
-
-    
-    train_loader = DataLoader(dataset, batch_size, shuffle=True, collate_fn=collate_fn)
+    train_ds = ContrastiveCIFAR(cifar_train)
+    train_loader = DataLoader(train_ds, batch_size, shuffle=True, num_workers=2, collate_fn=collate_fn)
 
     # add lora
-    inject_lora_into_clip()
+    inject_lora_into_clip(model, r=4, alpha=8)
     
-    freeze_clip(model)
-    for name, parameters in 
-
+    # freeze parameters except lora
+    for name, param in model.named_parameters():
+        if 'lora_attn' in name or 'c_fc' in name or 'c_proj' in name:
+            param.requires_grad = True
+        else:
+            param.requires_grad = False
+            
     model.to(device)
 
     # set optimizer
     optimizer = AdamW(model.parameters(), lr=1e-5)
 
     # train
-    train(model, train_loader, preprocess, device, optimizer, 200, CFG.model_path)
+    model_path = './cifar_clip_lora.pth'
+    train(model, train_loader, preprocess, device, optimizer, 200, model_path)
+
+
+if __name__ == "__main__":
+    ft_clip_lora()
+
