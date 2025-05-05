@@ -1,0 +1,7 @@
+\beamer@sectionintoc {1}{Zero-Shot Learning - Motivation for CLIP}{3}{0}{1}
+\beamer@sectionintoc {2}{Dataset Creation}{5}{0}{2}
+\beamer@sectionintoc {3}{CLIP Architecture}{7}{0}{3}
+\beamer@subsectionintoc {3}{1}{Image Encoder - self attention}{8}{0}{3}
+\beamer@subsectionintoc {3}{2}{Text Encoder}{22}{0}{3}
+\beamer@sectionintoc {4}{Training}{28}{0}{4}
+\beamer@subsectionintoc {4}{1}{Batch Construction}{28}{0}{4}

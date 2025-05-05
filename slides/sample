@@ -1,0 +1,866 @@
+\documentclass[aspectratio=169,xcolor=dvipsnames]{beamer}
+\usetheme{SimpleDarkBlue}
+\usepackage{textcomp}
+
+\usepackage{hyperref}
+\usepackage{subfig}
+\usepackage{gensymb}
+
+\usepackage{graphicx} % Allows including images
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+\renewcommand{\indent}{\hspace*{2em}}
+
+
+%-TITLE-PAGE-------------------------------------------
+
+\title{LoRA}
+
+\author{Yuchen Yan}
+\institute{Australian National University}
+\date{\today}
+
+%------------------------------------------------------
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+    \tableofcontents
+\end{frame}
+
+%------------------------------------------------
+\section{LoRA Problem Statement}
+%------------------------------------------------
+
+\begin{frame}{Problem statement - conditional language modeling objective}
+    Fine tuning, the model is initialized to pre-trained weights $\Phi{0}$ and updated to $\Phi_{0} + \Delta \Phi$ by repeatedly following the gradient to maximize the conditional language modeling objective:
+    \begin{align*}
+        \max _{\Phi} \sum_{(x, y) \in \mathcal{Z}} \sum_{t=1}^{|y|} \log \left(P_{\Phi}\left(y_t \mid x, y_{<t}\right)\right)
+    \end{align*}
+
+    \begin{itemize}
+        \item $\mathcal{Z}$ the training dataset of input-output pairs $(x,y)$
+        \item $y_{<t}$ all tokens before timestep $t$
+        \item $P_{\Phi}\left(y_t \mid x, y_{<t}\right)$ the model's predicted probability of the token $y_t$, given the input $x$ and previously generated tokens $y_{<t}$
+    \end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\section{Parameter efficient approach}
+%------------------------------------------------
+
+\begin{frame}{Parameter efficient approach}
+    Adopt a more parameter-efficient approach, where the task-specific parameter increment $\Delta \Phi=\Delta \Phi(\Theta)$ is further encoded by a much smaller-sized set of parameters $\Theta$ with $|\Theta| \ll\left|\Phi_0\right|$. The task of finding $\Delta \Phi$ thus becomes optimizing over $\Theta$ :
+    \bigskip
+    \begin{align*}
+        \max _{\Theta} \sum_{(x, y) \in \mathcal{Z}} \sum_{t=1}^{|y|} \log \left(p_{\Phi_0+\Delta \Phi(\Theta)}\left(y_t \mid x, y_{<t}\right)\right)
+    \end{align*}
+\end{frame}
+
+%------------------------------------------------
+\section{Existing solutions}
+%------------------------------------------------
+
+\begin{frame}{Existing solutions-Adapter}
+    \begin{columns}
+        \begin{column}{0.7\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=0.9\linewidth]{figures/adapter_architecture.png}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.3\textwidth}
+            Two adapter layers per Transformer block with bottleneck architecture to limit the number of parameters
+            \begin{align*}
+                |\Theta| = 2md + d + m
+            \end{align*}
+            $md$ for projection, $m$ for up-projection bias and $d$ for down-projection bias
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Existing solutions- Adapter Cont.}
+    \begin{columns}
+        \begin{column}{0.7\textwidth}
+            \begin{figure}
+            \centering
+            \includegraphics[width=0.8\linewidth]{figures/adapter_latency.png}
+            \end{figure}
+            \begin{figure}
+            \centering
+            \includegraphics[width=0.9\linewidth]{figures/adapter_parallelsim_latency.png}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.3\textwidth}
+            Adapters are added sequentially, without hardware parallelism (online inference scenario), a significant increase in latency 
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Existing solutions-Prefix tuning \& Limitation}
+    \begin{columns}
+        \begin{column}{0.7\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=0.9\linewidth]{figures/prefix_tuning_architecture.png}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.3\textwidth}
+           Prepends a sequence of \textit{continuous task-specific} vectors to the input, only prefix is optimized. \\
+           \bigskip
+           \textbf{Limitation} difficult to optimize and adapted reduced sequence length for application
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+
+
+%------------------------------------------------
+\section{Low-rank Adaptation}
+%------------------------------------------------
+
+\begin{frame}{Low-rank-parametrized Update Matrices - Inspiration}
+    \begin{columns}
+        \begin{column}{0.3\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=1\linewidth]{figures/LoRA_reparametrization.png}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.7\textwidth}
+            \textbf{Inspiration} Aghajayan et al. (2020) shows that the pre-trained language models have a low "intristic dimension" and can stil learn efficiently despite a random projection to a smaller subs
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+\subsection{Image Encoder}
+%------------------------------------------------
+
+\begin{frame}{Image Encoder - Vision Transformer}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\linewidth]{figures/ViT_architecture.png}
+        \label{ViT_architecture}
+    \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Image Encoder-Constructing Image Patches}
+
+\begin{columns}
+    \begin{column}{0.5\textwidth}
+    \includegraphics[width=\textwidth]{figures/patches_vision_transformer.png}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+    Reshape the image $x \in \mathbb{R}^{H\times W \times C}$ into a sequence of flattened 2D patches $x_p \in \mathbb{R}^{N\times (P^2\cdot C)}$\\
+    \smallskip
+    $(H,W) : $ resolution of original image\\
+    $C : $ number of channels\\
+    $(P,P) : $ resolution of image patch\\
+    $N=HW/P^2 : $ number of patches \\
+    \bigskip
+    Example\\
+    $224\times 224$ image with $3$ channels and $16\times 16$ patches,$N=196$
+\end{column}
+\end{columns}
+
+\end{frame}
+
+
+%------------------------------------------------
+
+\begin{frame}{Image Encoder - Linear Projection}
+
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+        \includegraphics[width=\textwidth]{figures/patches_vision_transformer.png}
+        \end{column}
+    
+        \begin{column}{0.5\textwidth}
+        Flatten the patches and map to $D$ dimensions using a trainable linear projection\\
+        \begin{align*}
+            \mathbf{z}_0
+            &=\left[\mathbf{x}_{\text {class }} ; \mathbf{x}_p^1 \mathbf{E} ; \mathbf{x}_p^2 \mathbf{E} ; \cdots ; \mathbf{x}_p^N \mathbf{E}\right]+\mathbf{E}_{p o s}, \\ 
+            \bigskip
+            &\mathbf{E} \in \mathbb{R}^{\left(P^2 \cdot C\right) \times D}, \\
+            &\mathbf{E}_{p o s} \in \mathbb{R}^{(N+1) \times D}
+            \end{align*}
+        Example\\
+        A $16\times 16$ patch with $3$ channels projected to $768$ dimensions, $D=768$
+    \end{column}
+    \end{columns}
+    
+    \end{frame}
+
+    
+%------------------------------------------------
+
+\begin{frame}{Image Encoder- \texttt{[class]} Token and Position Embeddings}
+
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+        \includegraphics[width=\textwidth]{figures/patches_vision_transformer.png}
+        \end{column}
+        
+        \begin{column}{0.5\textwidth}
+        \begin{itemize}
+            \item \texttt{[class]} token prepended to the sequence of embedded patches
+            \begin{itemize}
+                \item interacts with all patches through self-attention, capturing a global summary of the image
+                \item acts as the final representation for classification
+            \end{itemize}
+            \medskip
+            \item Position embeddings $\mathbf{E}_{p o s} \in \mathbb{R}^{(N+1) \times D}$
+            \begin{itemize}
+                \item added to the patch embedding to retain positional information
+                \item provide positional information
+            \end{itemize}
+        \end{itemize}
+    \end{column}
+    \end{columns}
+    \end{frame}
+    
+    
+%------------------------------------------------
+
+
+\begin{frame}{Self Attention - Layer Normalization}
+    \begin{columns}
+        \begin{column}{0.25\textwidth}
+        \includegraphics[width=\textwidth]{figures/transformer_encoder.png}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+        Normalize each embedding vector across the channel dimension
+        \begin{align*}
+            \begin{aligned}
+            & \mathrm{LN}(\mathbf{x})=\boldsymbol{\gamma} \odot \frac{\mathbf{x}-\hat{\boldsymbol{\mu}}}{\hat{\boldsymbol{\sigma}}}+\boldsymbol{\beta} . \\
+            & \hat{\boldsymbol{\mu}}=\frac{1}{d} \sum_{x^i \in \mathbf{x}} x^i \\
+            & \hat{\boldsymbol{\sigma}}^2=\frac{1}{d} \sum_{x^i \in \mathbf{x}}\left(x^i-\hat{\boldsymbol{\mu}}\right)^2+\epsilon \\
+            \end{aligned}
+            \end{align*}
+            $\gamma, \beta \in \mathbb{R}^D$ learnable scale and shift parameters \\
+            $\epsilon$ small constant to avoid division by zero \\
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Layer Normalization - Explanation}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.8\linewidth]{figures/normalisation.png}
+        \label{normalisation}
+    \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Layer Normalization - Explanation cont.} 
+    \begin{columns}
+        \begin{column}{0.65\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=\textwidth]{figures/normalized_gradient_descent.png}
+                \label{normalized_gradient_descent}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.35\textwidth}
+            \begin{itemize}
+                \item Faster convergence
+                \item Mitigating interval covariate shift
+                \item Reducing the chance of exploding or vanishing gradients
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+
+\begin{frame}{Image Encoder - Self Attention}
+    \begin{columns}
+        \begin{column}{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/self_attention.png}
+        \end{column}
+        \begin{column}{0.6\textwidth}
+            \begin{itemize}
+                \item $b^i$ is obtained based on the whole input sequence
+                \item $b^1,b^2,b^3,b^4$ can be parallelly computed
+             \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Image Encoder - Self Attention}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+        \includegraphics[width=1\textwidth]{figures/self_attention_matrix.png}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \begin{itemize}
+                \item $q:$ query (to math others)
+                \begin{align*}
+                    q^i = W^{q}a^i
+                \end{align*}
+                \item $k:$ key (to be matched)
+                \begin{align*}
+                    k^i = W^{k}a^i
+                \end{align*}
+                \item $v:$ information to be extracted
+                \begin{align*}
+                    v^i = W^{v}a^i
+                \end{align*}
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Image Encoder - Self Attention}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=1\linewidth]{figures/self_attention_dot_product.png}
+                \label{self_attention_dot_product}
+            \end{figure}
+        \end{column}
+
+        \begin{column}{0.4\textwidth}
+            Use each query to compute the dot product with all keys. The formula for computing the attention weights is called Scaled Dot-Product Attention:
+            \begin{align*}
+                \alpha_{1,i}= q^i \cdot k^i / \sqrt{d}, d \ \text{dimension of} \ q^i, k^i
+            \end{align*}  
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Image Encoder - Self Attention}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=1\linewidth]{figures/self_attention_softmax.png}
+                \label{self_attention_softmax}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            Apply a soft-max function to obtain the normalized attention weights:
+            \begin{align*}
+                \hat{\alpha}_{1,i}= \exp(\alpha_{1,i}) / \sum\nolimits_{j=1}^{N} \exp(\alpha_{1,j}) 
+            \end{align*}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Image Encoder - Self Attention}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=1\linewidth]{figures/self_attention_summing.png}
+                \label{self_attention_summing}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            The output $b^i$ of the self-attention layer is the sum of the normalized attention weights and the value vectors:
+            \begin{align*}
+                b^1 = \sum\nolimits_{i=1}^{N} \hat{\alpha}_{1,i}v^i
+            \end{align*}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Image Encoder - Self Attention conc.}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.6\linewidth]{figures/self_attention_matrix_multiplication.png}
+        \label{self_attention_matrix_multiplication}
+    \end{figure}
+    All these vector operations can concatenated into matrix multiplications. Therefore, GPU can be used to accelerate the computation.\\
+
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Self Attention - Multihead Self Attention}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.6\linewidth]{figures/multihead_self_attention.png}
+        \label{multihead_self_attention}
+    \end{figure}
+    We have more than one $W^q$, $W^k$, and $W^v$ to learn different linear projections. The output of each head is concatenated and projected to the final output dimension.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Self Attention - Multihead Self Attention}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.6\linewidth]{figures/multihead_self_attention_weights.png}
+        \label{multihead_self_attention_weights}
+    \end{figure}
+    The calculation of $b^{i,1}$ only includes the multiplication of $q^i$ and $k^i$ in the first head.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Self Attention - Multihead Self Attention}
+    \begin{columns}
+        \begin{column}{0.7\textwidth}
+            \begin{figure}
+            \centering
+            \includegraphics[width=0.9\linewidth]{figures/multihead_self_attention_output_concatenation.png}
+            \label{multihead_self_attention_output_concatenation}
+            \end{figure}
+        \end{column}
+        \begin{column}{0.3\textwidth}
+            Two outputs of the multihead self-attention layer are concatenated by multiplying a $W^0$ matrix and projected to the final output dimension.
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
+
+
+%------------------------------------------------
+
+\begin{frame}{Image Encoder - Vision Transformer}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\linewidth]{figures/ViT_architecture.png}
+        \label{ViT_architecture}
+    \end{figure}
+\end{frame}
+
+%------------------------------------------------
+\subsection{Text Encoder}
+%------------------------------------------------
+
+\begin{frame}{Text Encoder - Modified Transformer}
+    \begin{block}{Quote}
+        \textit{As a base size we use a 12-layer 512-wide model with 8 attention heads. The transformer operates on a \textbf{lower-cased byte pair encoding (BPE) representation} of the text (Sennrich et al., 2015). The text sequence is bracketed
+        with [SOS] and [EOS] tokens and the activations of the highest layer of the transformer at the [EOS] token are used as the feature representation of the text which is layer normalized and then linearly projected into the multi-modal embedding space. Masked self-attention was used in the text encoder to preserve the ability to add language modeling as an auxiliary objective, though exploration of this is left as
+        future work.}
+        
+    \end{block}
+    
+    
+\end{frame}
+
+%------------------------------------------------
+
+
+
+\begin{frame}{Subword-based Tokenization - BPE}
+    \textbf{Byte-Pair Encoding (BPE)}
+    is a simple form of data compression algorithm in which the most common pair of consecutive bytes of data is replaced with a byte that does not occur in that data.
+    \medskip
+    \begin{block}{Motivation}
+        Transformer has limited capacity to process long sequences, BPE is used to reduce the vocabulary size and the length of the input sequence
+    \end{block}
+    \medskip
+    \textbf{$[SOS] $ and $[EOS]$} special tokens added to the beginning and end of the text, indicating the start and end of the text.
+    
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Subword-based Tokenization - BPE}
+    
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\linewidth]{figures/BPE.png}
+        \label{BPE_example}
+    \end{figure}
+    
+\end{frame}
+
+%------------------------------------------------
+
+
+\begin{frame}{BPE - example}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\linewidth]{figures/BPE_demo.png}
+        \label{BPE_demo}
+    \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Encoder}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.7 \linewidth]{figures/contrastive_pre_training.png}
+    \end{figure}
+\end{frame}
+
+%------------------------------------------------
+\section{Training}
+%------------------------------------------------
+
+\begin{frame}{Training}
+    Both models are optimized during pretraining to align similar text ad images in vector space. It does this by taking image-text pairs and pushing their output vectors nearer in vector space while pushing the output vectors of dissimilar pairs further apart.
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pre-Training Method Selection-Distance Metric Learning}
+    \begin{block}{Contrastive loss}
+    takes pairs of example as input and trains a network to predict whether two inputs are from the same class or not.
+     \begin{align*}
+        \mathcal{L}_{\text {cont }}^m\left(x_i, x_j ; f\right)=\mathbf{1}\left\{y_i=y_j\right\}\left\|f_i-f_j\right\|_2^2+\mathbf{1}\left\{y_i \neq y_j\right\} \max \left(0, m-\left\|f_i-f_j\right\|_2\right)^2
+    \end{align*}
+    \end{block}
+    \bigskip
+    $1\{y_i=y_j\}$ indicator function
+    ,
+    $\left\|f_i-f_j\right\|_2 = \sqrt{\sum_k(f_i^{(k)}-f_j^{(k)})^2}$ \\
+    \medskip
+    $\max \left(0, m-\left\|f_i-f_j\right\|_2\right)^2$ 
+    \begin{itemize}
+        \item if $m-\left\|f_i-f_j\right\|_2^2  \leq 0 =0$ no loss is added\\
+        \item elif $m-\left\|f_i-f_j\right\|_2^2  > 0 =0$ the loss is positive, penalty added, separating two embeddings in Euclidean space
+    \end{itemize}
+    
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pretraining Method Selection-Distance Metric Learning}
+    \begin{block}{Triplet loss}
+    composed of triplets, consisting of a query, a positive example, and a negative example
+        \begin{align*}
+        \mathcal{L}_{\text {tri }}^m\left(x, x^{+}, x^{-} ; f\right)=\max \left(0,\left\|f-f^{+}\right\|_2^2-\left\|f-f^{-}\right\|_2^2+m\right)
+        \end{align*}
+     \end{block}
+    \bigskip
+    $\max \left(0,\left\|f-f^{+}\right\|_2^2-\left\|f-f^{-}\right\|_2^2+m\right)$ 
+    \begin{itemize}
+        \item if $\left\|f-f^{-}\right\|_2^2 - \left\|f-f^{+}\right\|_2^2 \geq m$ no loss is added\\
+        \item elif $\left\|f-f^{-}\right\|_2^2 - \left\|f-f^{+}\right\|_2^2 < m$ the loss is positive, model penalised
+    \end{itemize}
+    
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pretraining Method Selection-Distance Metric Learning}
+    \textbf{Limitation} both loss functions are known to suffer from slow convergence and they often require expensive data sampling method to provide nontrivial pairs or triplets to accelerate the training\\
+    Trivial pairs $\rightarrow$ weak gradient updates $\rightarrow$ slow convergence\\
+    \bigskip
+    Nontrivial pairs
+    \begin{itemize}
+        \item Hard positive pairs: Pairs from the same class that are far apart in feature space force the model to learn better embeddings to bring them closer.
+        \item Hard negative pairs: Pairs from different classes that are close together push the model to better separate different classes.
+    \end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pre-Training Method Selection-Distance Metric Learning with Multiple Negative Examples}
+    \textbf{Goal} 
+    \begin{itemize}
+        \item positives examples $\rightarrow$ shorten distances between embedding vectors 
+        \item negative examples $\rightarrow$ enlarging distances
+    \end{itemize}
+    \bigskip
+    \textbf{Problem}\\
+    During the update, the triplet loss only compares an example with one negative example while ignoring negative examples from the rest of the classes. The consequence is the embedding vector of an example is only guaranteed to be far from the selected negative class but not the others. \\
+    \bigskip
+    \textbf{Solution} A loss function that recruits multiple negatives for each update
+    
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pretraining Method Selection - Distance Metric Learning with Multiple Negative Examples}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\linewidth]{figures/one_negative_vs_multiple_negative.png}
+        \caption{Triplet Loss vs. Multiple Negative Examples Loss }
+        \label{onmn}
+    \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pretraining Method Selection-Distance Metric Learning with Multiple Negative Examples}
+    \begin{block}{(N+1)-tuplet loss}
+    \begin{align*}
+        \mathcal{L}\left(\left\{x, x^{+},\left\{x_i\right\}_{i=1}^{N-1}\right\} ; f\right)=\log \left(1+\sum_{i=1}^{N-1} \exp \left(f^{\top} f_i-f^{\top} f^{+}\right)\right)
+    \end{align*}
+    \end{block}
+    \bigskip
+    Cosine similarity $f^Tf_i=\left||f\right||\left||f_i\right||\cos{\theta}$\\
+    \begin{itemize}
+        \item if dot product is large, $\cos{\theta} \rightarrow 1$, $\theta \rightarrow 0$, high similarity
+        \item small, $\cos{\theta} \rightarrow 0$, $\theta \rightarrow \perp$, no similarity
+        \item negative, $\cos{\theta} \rightarrow -1$, $\theta \rightarrow 180\degree$, strong dissimilarity
+    \end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pretraining Method Selection- N-pair Loss Batch Construction}
+    \textbf{Problem} When the batch size of Stochastic Gradient Descent is $M$, there are $M \times (N+1)$ examples to be passed through $f$ at one update. Too large and impractical to scale.\\
+    \bigskip
+    \textbf{Effective Batch Construction}\\
+    \medskip
+    $N$ pairs of examples from $N$ different classes $\left\{\left(x_1, x_1^{+}\right), \cdots,\left(x_N, x_N^{+}\right)\right\}$\\
+    \medskip
+    Build $N$ tuples, denoted as $\left\{S_i\right\}_{i=1}^N$, from the $N$ pairs.
+    \medskip
+    \begin{itemize}
+        \item $S_i=\left\{x_i, x_1^{+}, x_2^{+}, \cdots, x_N^{+}\right\}$
+        \smallskip
+        \begin{itemize}
+            \item $x_i$ is the query for $S_i$ 
+            \smallskip
+            \item $x_i^+$ a positive example, rest are negative examples
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pretraining Method Selection-Distance Metric Learning with Multiple Negative Examples}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\linewidth]{figures/pushing_N_examples_simultaneously.png}
+        \label{n_examples}
+    \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pretraining Method Selection-CLIP \& Multi-class N-pair Loss}    
+    \begin{figure}
+        \centering
+        \subfloat{{\includegraphics[width=5cm]{figures/n_pair_mc_loss.png} }}%
+        \qquad
+        \subfloat{{\includegraphics[width=7.5cm]{figures/contrastive_pre_training.png} }}%
+    \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pretraining Method Selection - Symmetric Entropy Loss(N-pair Loss/InfoNCE)}
+Samples a batch of $N$ input pairs $(x_v,x_u)$ for training data, and calculate their representation pairs $(v,u)$, $i$-th pair denoted as $(v_i,u_i)$. The training objective of CLIP involves two loss functions. The first loss function is an image-text contrastive loss for the $i$-th pair: \\
+    \begin{align*}
+        \ell_i^{(v \rightarrow u)}=-\log \frac{\exp \left(\left\langle\mathbf{v}_i, \mathbf{u}_i\right\rangle / \tau\right)}{\sum_{k=1}^N \exp \left(\left\langle\mathbf{v}_i, \mathbf{u}_k\right\rangle / \tau\right)}\\
+    \end{align*}
+where $\langle v_i, u_i \rangle$ represents the cosine similarity \\
+$\tau \in \mathbb{R^+}$ represents a temperature parameter, affects the smoothness of the probability distribution over the negative examples.\\
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Contrastive learning - temperature $\tau$}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=0.85\linewidth]{figures/alignment.png}
+                \label{alignment} 
+            \end{figure}
+        \end{column}
+        \begin{column}{0.3\textwidth}
+            Alignment favors encoders that assign similar features to similar samples.\\
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Contrastive learning - temperature $\tau$}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=0.8\linewidth]{figures/uniformity.png}
+                \label{alignment} 
+            \end{figure}
+        \end{column}
+        \begin{column}{0.3\textwidth}
+            Uniformity prefers a feature distribution that preserves maximal information, i.e., the uniform distribution on the unit hypersphere.\\
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Contrastive learning - temperature $\tau$}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \begin{figure}
+                \centering
+                \includegraphics[width=1.1\linewidth]{figures/visualization _embedding_distribution.png}
+                \label{visualization_embedding_distribution} 
+            \end{figure}
+        \end{column}
+        \begin{column}{0.3\textwidth}
+            Small temperature tends to generate
+            more uniform distribution and be less tolerant to similar samples.
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Pre-Training Method Selection - Symmetric Entropy Loss}
+Image-to-text contrastive loss is asymmetric for each input modality. Therefore, defined a similar text-to-image contrastive loss as: \\
+    \begin{align*}
+        \ell_i^{(u \rightarrow v)}=-\log \frac{\exp \left(\left\langle\mathbf{u}_i, \mathbf{v}_i\right\rangle / \tau\right)}{\sum_{k=1}^N \exp \left(\left\langle\mathbf{u}_i, \mathbf{v}_k\right\rangle / \tau\right)} \\
+    \end{align*}
+Final training loss is then computed as a weighted combination of the two losses averaged over all positive image-text pairs in each batch:\\
+    \begin{align*}
+        \mathcal{L}=\frac{1}{N} \sum_{i=1}^N\left(\lambda \ell_i^{(v \rightarrow u)}+(1-\lambda) \ell_i^{(u \rightarrow v)}\right)
+    \end{align*}
+\end{frame}
+
+%------------------------------------------------
+
+
+\begin{frame}{Analysis - Initial Comparison to Visual N-Grams }
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.55\linewidth]{figures/comparison_visual_n_grams .png}
+    \end{figure}
+    \begin{itemize}
+        \item matches the performance of the original ResNet50 despite using one of the 1.28 million crowd-labeled training examples
+        \item high 95\% top-5 accuracy
+            \begin{itemize}
+                \item any of the model 5 highest probability answers must match the expected answer
+            \end{itemize}
+        \item Differences controlled comparison between CLIP ResNtt50 and N-Grams on the same YFCC100M dataset, matched performance
+    \end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Analysis - Zero-Shot Performance}
+\begin{columns}
+    \begin{column}{0.48\textwidth}
+    \includegraphics[width=\textwidth]{figures/zero_shot_fully_supervised_baseline.png}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+        \textbf{Comparison}\\
+        \begin{itemize}
+            \item \textbf{baseline} a fully supervised, regularized, logistic regression classifier on the features of the canonical ResNet50 across 27 datasets
+        \end{itemize}
+        \textbf{Outperforms}\\
+        \begin{itemize}
+            \item limited number of labeled examples
+            \item general object classification datasets
+            \item datasets measuring action recognition in videos
+        \end{itemize}
+        \textbf{Underperforms}\\
+        \begin{itemize}
+            \item visual concepts involving verbs
+            \item specialized, complex, or abstract tasks
+        \end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Analysis - Zero-Shot Performance}
+\begin{columns}
+    \begin{column}{0.45\textwidth}
+    \includegraphics[width=\textwidth]{figures/few_shot_comparison.png}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+        \textbf{Comparison with few-shot methods}\\
+        \begin{itemize}
+            \item few-shot logistic regression on the features of many image models
+        \end{itemize}
+        \textbf{matches}\\
+        \begin{itemize}
+            \item 4-shot logistic regression on the same feature space \\
+            \begin{itemize}
+                \item CLIP’s zero-shot classifier:is generated via natural languags which allows for visual concepts to be directly specified
+                \item normal supervised learning: must infer concepts indirectly from training examples
+            \end{itemize}
+        \end{itemize}
+        \textbf{roughly matches}\\
+        \begin{itemize}
+            \item 16-shot classifier, which uses the features of a BiT-M ResNet152x2 trained on ImageNet-21K.
+        \end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Analysis - Representation Learning}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.75 \linewidth]{figures/representation_learning_capability.png}
+        \label{representation_learning_capability}
+    \end{figure}    
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Analysis - Representation Learning}
+    \begin{itemize}
+        \item the largest CLIP model slightly outperforms the best existing model on both overall score and compute efficiency
+        \item CLIP transformers 3x more compute efficient than CLIP ResNets
+        \bigskip
+        \textbf{Broader evaluation suite} tasks include geo-localization, optical character recognition, facial emotion recognition, and character recognition
+        \begin{itemize}
+            \item All CLIP models, regardless of scale, outperform all evaluated systems in terms of compute efficiency
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{Analysis -  Distribution shift}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.75 \linewidth]{figures/distribution_shift.png}
+        \label{distribution_shift}
+    \end{figure}   
+    Zero-shot CLIP is much more robust to distribution shift than the ResNet101.\\
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+    \Huge{\centerline{\textbf{The End}}}
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
