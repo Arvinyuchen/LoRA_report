@@ -23,14 +23,25 @@ class QuickGELU(nn.Module):
         return x * torch.sigmoid(1.702 * x)
     
 
+
+def expand_mask(mask):
+    assert mask.ndim >= 2, "Mask must be at least 2-dimensional with seq_length x seq_length"
+    if mask.ndim == 3:
+        mask = mask.unsqueeze(1)
+    while mask.ndim < 4:
+        mask = mask.unsqueeze(0)
+    return mask
+    
+
+
 class ResidualAttentionBlock(nn.Module):
-    def __init__(self, d_model: int, n_head: int, attn_mask: torch.Tensor = None, r=4, lora_alpha=8):
+    def __init__(self, d_model: int, n_head: int, attn_mask: torch.Tensor = None):
         super().__init__()
         assert d_model % n_head == 0, "Embedding dimension must be 0 modulo number of heads."
 
         self.d_model = d_model
         self.n_head = n_head
-        self.num_heads = d_model // n_head
+        self.d_head = d_model // n_head
 
         self.qkv_proj = LoRALinear(d_model, 3 * d_model)
         self.out_proj = LoRALinear(d_model, d_model)
@@ -45,67 +56,31 @@ class ResidualAttentionBlock(nn.Module):
         self.ln_2 = LayerNorm(d_model)
         self.attn_mask = attn_mask
 
-        def attention(self, x: torch.Tensor):
-            batch_size, seq_len, _ = x.shape
-            x_norm = self.ln_1(x)
-            qkv = self.qkv_proj(x_norm)
-            q, k, v = qkv.chunk(3, dim=-1)
-            x = x + self.attention(self.ln(x))
-
-
-            x = x + self.mlp(self.ln_2(x))
-            return x
-
-        def forward(self, x: torch.Tensor):
-            x = x + self.atttention(self.ln(1))
-            x = x + self.mlp(self.ln(x))
-            return x 
-
-
-
-
-
-        # Inject LoRA into in_proj_weight via MergedLinear
-        self.attn_lora = MergedLinear(
-            in_features=d_model,
-            out_features=3 * d_model,  # qkv merged
-            r=r,
-            lora_alpha=lora_alpha,
-            enable_lora=[True, True, True],  # enable for q, k, v
-            fan_in_fan_out=False
-        )
-
-        self.ln_1 = LayerNorm(d_model)
-        self.mlp = nn.Sequential(OrderedDict([
-            ("c_fc", LoRALinear(d_model, d_model * 4)),
-            ("gelu", QuickGELU()),
-            ("c_proj", LoRALinear(d_model * 4, d_model)),
-        ]))
-        self.ln_2 = LayerNorm(d_model)
-        self.attn_mask = attn_mask
-
     def attention(self, x: torch.Tensor):
+        batch_size, seq_len, c = x.shape
+        if self.attn_mask is not None:
+            self.attn_mask = expand_mask(self.attn_mask)
         x_norm = self.ln_1(x)
 
-        # Compute QKV + LoRA delta in one shot
-        qkv = F.linear(x_norm, self.attn.in_proj_weight, self.attn.in_proj_bias) + self.attn_lora(x_norm)
+        qkv = self.qkv_proj(x_norm)
+        qkv = qkv.view(batch_size, seq_len, self.n_head, 3 * self.d_head).permute(0, 2, 1, 3)
+        q, k, v = qkv.chunk(3, dim=-1)
 
-        # Split qkv for attention call
-        E = self.attn.embed_dim
-        q, k, v = qkv.split(E, dim=-1)
+        # Scaled Dot-Product Attention 
+        attn_logits = (q @ k.transpose(-2, -1))
+        if self.attn_mask is not None:
+            attn_logits = attn_logits.masked_fill(self.attn_mask == 0, -1e9)
+        attn = F.softmax(attn_logits, dim=-1)
 
-        out, _ = self.attn(
-            query=q, key=k, value=v,
-            need_weights=False,
-            attn_mask=self.attn_mask
-        )
-        return out
+        out = (attn @ v).permute(0, 2, 1, 3).reshape(batch_size, seq_len, self.d_model)
+        return self.out_proj(out)
+
 
     def forward(self, x: torch.Tensor):
         x = x + self.attention(x)
         x = x + self.mlp(self.ln_2(x))
-        return x
-    
+        return x 
+
 
 
 class Transformer(nn.Module):
@@ -157,21 +132,4 @@ class VisionTransformer(nn.Module):
         return x
 
 
-
-def inject_lora_into_clip(clip_model, r=4, alpha=8):
-    def patch_transformer(transformer: nn.Module):
-        for i, block in enumerate(transformer.resblocks):
-            transformer.resblocks[i] = ResidualAttentionBlock(
-                d_model=block.attn.embed_dim,
-                n_head=block.attn.num_heads,
-                attn_mask=block.attn_mask,
-                r=r,
-                lora_alpha=alpha
-            )
-
-    # Patch the vision transformer
-    patch_transformer(clip_model.visual.transformer)
-
-    # Patch the text transformer
-    patch_transformer(clip_model.transformer)
 
