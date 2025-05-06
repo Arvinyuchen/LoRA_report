@@ -3,5 +3,5 @@
 \beamer@sectionintoc {3}{Existing solutions}{5}{0}{3}
 \beamer@sectionintoc {4}{Low-rank Adaptation}{8}{0}{4}
 \beamer@subsectionintoc {4}{1}{Experiments}{11}{0}{4}
-\beamer@subsectionintoc {4}{2}{Text Encoder}{33}{0}{4}
-\beamer@sectionintoc {5}{Training}{38}{0}{5}
+\beamer@subsectionintoc {4}{2}{Text Encoder}{40}{0}{4}
+\beamer@sectionintoc {5}{Training}{45}{0}{5}

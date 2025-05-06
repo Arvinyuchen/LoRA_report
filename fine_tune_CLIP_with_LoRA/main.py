@@ -3,6 +3,7 @@ import os
 from torchvision.datasets import CIFAR100
 from torch.utils.data import DataLoader, dataset
 from dataset import collate_fn, ContrastiveCIFAR
+from model import inject_lora_into_clip
 from torch.optim import AdamW
 from train import train
 
@@ -23,6 +24,9 @@ def ft_clip_lora():
     cifar_train = CIFAR100(root, download=True, train=True)
     train_ds = ContrastiveCIFAR(cifar_train)
     train_loader = DataLoader(train_ds, batch_size, shuffle=True, num_workers=2, collate_fn=collate_fn)
+
+    # add lora
+    inject_lora_into_clip(model, r=4, alpha=8)
     
     # freeze parameters except lora
     for name, param in model.named_parameters():

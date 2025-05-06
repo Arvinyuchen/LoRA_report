@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.4.6)  21 APR 2025 17:25
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.4.6)  6 MAY 2025 10:11
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -752,9 +752,7 @@ Package gensymb Info: Using \textohm for \ohm on input line 34.
 Package gensymb Info: Using \textmu for \micro on input line 34.
  (./sample.nav) [1
 
-]
-No file sample.toc.
-[2
+] (./sample.toc) [2
 
 ]
 LaTeX Font Info:    Trying to load font information for U+msa on input line 59.
@@ -812,18 +810,15 @@ File: figures/transformer_architecture.png Graphic file (type bmp)
  [10
 
 ]
-File: figures/baselines.png Graphic file (type bmp)
-<figures/baselines.png>
- [11
-
-]
 File: figures/GLUE.png Graphic file (type bmp)
 <figures/GLUE.png>
 
-Overfull \vbox (6.26627pt too high) detected at line 233
+Overfull \vbox (6.26627pt too high) detected at line 223
  []
 
-[12
+[11
+
+] [12
 
 ] [13
 
@@ -831,260 +826,292 @@ Overfull \vbox (6.26627pt too high) detected at line 233
 
 ] [15
 
-] [16
+]
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10> not available
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 313.
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <7> not available
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 313.
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <5> not available
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 313.
+LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <9> not available
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 313.
+ [16
+
+]
+File: figures/baselines.png Graphic file (type bmp)
+<figures/baselines.png>
+ [17
+
+]
+File: figures/gpt2_fintune.png Graphic file (type bmp)
+<figures/gpt2_fintune.png>
+ [18
+
+]
+File: figures/gpt3_finetune.png Graphic file (type bmp)
+<figures/gpt3_finetune.png>
+ [19
+
+]
+File: figures/gpt3_performance_parameters.png Graphic file (type bmp)
+<figures/gpt3_performance_parameters.png>
+ [20
+
+] [21
+
+] [22
+
+]
+File: figures/budget_parameter.png Graphic file (type bmp)
+<figures/budget_parameter.png>
+ [23
 
 ]
 File: figures/patches_vision_transformer.png Graphic file (type bmp)
 <figures/patches_vision_transformer.png>
- [17
+ [24
 
 ]
 File: figures/patches_vision_transformer.png Graphic file (type bmp)
 <figures/patches_vision_transformer.png>
 LaTeX Font Info:    Font shape `TU/lmss/b/n' in size <10.95> not available
-(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 351.
+(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 446.
 LaTeX Font Info:    Font shape `TU/lmss/b/n' in size <8> not available
-(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 351.
+(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 446.
 LaTeX Font Info:    Font shape `TU/lmss/b/n' in size <6> not available
-(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 351.
- [18
+(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 446.
+ [25
 
 ]
 File: figures/patches_vision_transformer.png Graphic file (type bmp)
 <figures/patches_vision_transformer.png>
 LaTeX Font Info:    Font shape `TU/lmss/b/n' in size <10> not available
-(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 379.
+(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 474.
 LaTeX Font Info:    Font shape `TU/lmss/b/n' in size <7> not available
-(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 379.
+(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 474.
 LaTeX Font Info:    Font shape `TU/lmss/b/n' in size <5> not available
-(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 379.
-LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 379.
-LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <7> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 379.
-LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <5> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 379.
- [19
+(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 474.
+ [26
 
 ]
 File: figures/transformer_encoder.png Graphic file (type bmp)
 <figures/transformer_encoder.png>
 LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <10.95> not available
-(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 403.
+(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 498.
 LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <8> not available
-(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 403.
+(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 498.
 LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <6> not available
-(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 403.
+(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 498.
 LaTeX Font Info:    Font shape `TU/lmss/b/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/bx/it' tried instead on input line 403.
+(Font)              Font shape `TU/lmss/bx/it' tried instead on input line 498.
 LaTeX Font Info:    Font shape `TU/lmss/bx/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/bx/sl' tried instead on input line 403.
+(Font)              Font shape `TU/lmss/bx/sl' tried instead on input line 498.
 LaTeX Font Info:    Font shape `TU/lmss/b/it' in size <8> not available
-(Font)              Font shape `TU/lmss/bx/it' tried instead on input line 403.
+(Font)              Font shape `TU/lmss/bx/it' tried instead on input line 498.
 LaTeX Font Info:    Font shape `TU/lmss/bx/it' in size <8> not available
-(Font)              Font shape `TU/lmss/bx/sl' tried instead on input line 403.
+(Font)              Font shape `TU/lmss/bx/sl' tried instead on input line 498.
 LaTeX Font Info:    Font shape `TU/lmss/b/it' in size <6> not available
-(Font)              Font shape `TU/lmss/bx/it' tried instead on input line 403.
+(Font)              Font shape `TU/lmss/bx/it' tried instead on input line 498.
 LaTeX Font Info:    Font shape `TU/lmss/bx/it' in size <6> not available
-(Font)              Font shape `TU/lmss/bx/sl' tried instead on input line 403.
+(Font)              Font shape `TU/lmss/bx/sl' tried instead on input line 498.
 LaTeX Font Info:    Font shape `TS1/lmss/b/n' in size <10.95> not available
-(Font)              Font shape `TS1/lmss/bx/n' tried instead on input line 403.
+(Font)              Font shape `TS1/lmss/bx/n' tried instead on input line 498.
 LaTeX Font Info:    Font shape `TS1/lmss/b/n' in size <8> not available
-(Font)              Font shape `TS1/lmss/bx/n' tried instead on input line 403.
+(Font)              Font shape `TS1/lmss/bx/n' tried instead on input line 498.
 LaTeX Font Info:    Font shape `TS1/lmss/b/n' in size <6> not available
-(Font)              Font shape `TS1/lmss/bx/n' tried instead on input line 403.
- [20
+(Font)              Font shape `TS1/lmss/bx/n' tried instead on input line 498.
+ [27
 
 ]
 File: figures/normalisation.png Graphic file (type bmp)
 <figures/normalisation.png>
- [21
+ [28
 
 ]
 File: figures/normalized_gradient_descent.png Graphic file (type bmp)
 <figures/normalized_gradient_descent.png>
- [22
+ [29
 
 ]
 File: figures/self_attention.png Graphic file (type bmp)
 <figures/self_attention.png>
- [23
+ [30
 
 ]
 File: figures/self_attention_matrix.png Graphic file (type bmp)
 <figures/self_attention_matrix.png>
- [24
+ [31
 
 ]
 File: figures/self_attention_dot_product.png Graphic file (type bmp)
 <figures/self_attention_dot_product.png>
 
-Overfull \hbox (7.06116pt too wide) detected at line 498
+Overfull \hbox (7.06116pt too wide) detected at line 593
 []
  []
 
-[25
+[32
 
 ]
 File: figures/self_attention_softmax.png Graphic file (type bmp)
 <figures/self_attention_softmax.png>
- [26
+ [33
 
 ]
 File: figures/self_attention_summing.png Graphic file (type bmp)
 <figures/self_attention_summing.png>
- [27
+ [34
 
 ]
 File: figures/self_attention_matrix_multiplication.png Graphic file (type bmp)
 <figures/self_attention_matrix_multiplication.png>
- [28
+ [35
 
 ]
 File: figures/multihead_self_attention.png Graphic file (type bmp)
 <figures/multihead_self_attention.png>
- [29
+ [36
 
 ]
 File: figures/multihead_self_attention_weights.png Graphic file (type bmp)
 <figures/multihead_self_attention_weights.png>
- [30
+ [37
 
 ]
 File: figures/multihead_self_attention_output_concatenation.png Graphic file (type bmp)
 <figures/multihead_self_attention_output_concatenation.png>
- [31
+ [38
 
 ]
 File: figures/ViT_architecture.png Graphic file (type bmp)
 <figures/ViT_architecture.png>
- [32
+ [39
 
 ]
 LaTeX Font Info:    Font shape `TU/lmss/bx/it' in size <10.95> not available
-(Font)              Font shape `TU/lmss/bx/sl' tried instead on input line 618.
- [33
+(Font)              Font shape `TU/lmss/bx/sl' tried instead on input line 713.
+ [40
 
-] [34
+] [41
 
 ]
 File: figures/BPE.png Graphic file (type bmp)
 <figures/BPE.png>
- [35
+ [42
 
 ]
 File: figures/BPE_demo.png Graphic file (type bmp)
 <figures/BPE_demo.png>
 
-Overfull \vbox (10.05827pt too high) detected at line 657
+Overfull \vbox (10.05827pt too high) detected at line 752
  []
 
-[36
+[43
 
 ]
 File: figures/contrastive_pre_training.png Graphic file (type bmp)
 <figures/contrastive_pre_training.png>
 
-Overfull \vbox (5.79349pt too high) detected at line 666
+Overfull \vbox (5.79349pt too high) detected at line 761
  []
 
-[37
+[44
 
-] [38
+] [45
 
-] [39
+] [46
 
-] [40
+] [47
 
-] [41
+] [48
 
-] [42
+] [49
 
 ]
 File: figures/one_negative_vs_multiple_negative.png Graphic file (type bmp)
 <figures/one_negative_vs_multiple_negative.png>
- [43
+ [50
 
-] [44
+] [51
 
-] [45
+] [52
 
 ]
 File: figures/pushing_N_examples_simultaneously.png Graphic file (type bmp)
 <figures/pushing_N_examples_simultaneously.png>
- [46
+ [53
 
 ]
 File: figures/n_pair_mc_loss.png Graphic file (type bmp)
 <figures/n_pair_mc_loss.png>
 File: figures/contrastive_pre_training.png Graphic file (type bmp)
 <figures/contrastive_pre_training.png>
- [47
+ [54
 
-] [48
+] [55
 
 ]
 File: figures/alignment.png Graphic file (type bmp)
 <figures/alignment.png>
 LaTeX Font Info:    Font shape `TU/lmss/b/n' in size <14.4> not available
-(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 843.
+(Font)              Font shape `TU/lmss/bx/n' tried instead on input line 938.
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <14.4> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 843.
- [49
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 938.
+ [56
 
 ]
 File: figures/uniformity.png Graphic file (type bmp)
 <figures/uniformity.png>
- [50
+ [57
 
 ]
 File: figures/visualization _embedding_distribution.png Graphic file (type bmp)
 <figures/visualization _embedding_distribution.png>
 
-Overfull \hbox (24.6884pt too wide) in paragraph at lines 878--878
+Overfull \hbox (24.6884pt too wide) in paragraph at lines 973--973
  [] 
  []
 
-[51
+[58
 
-] [52
+] [59
 
 ]
 File: figures/comparison_visual_n_grams .png Graphic file (type bmp)
 <figures/comparison_visual_n_grams .png>
- [53
+ [60
 
 ]
 File: figures/zero_shot_fully_supervised_baseline.png Graphic file (type bmp)
 <figures/zero_shot_fully_supervised_baseline.png>
 
-Overfull \vbox (7.25548pt too high) detected at line 938
+Overfull \vbox (7.25548pt too high) detected at line 1033
  []
 
-[54
+[61
 
 ]
 File: figures/few_shot_comparison.png Graphic file (type bmp)
 <figures/few_shot_comparison.png>
 
-Overfull \vbox (8.73378pt too high) detected at line 967
+Overfull \vbox (8.73378pt too high) detected at line 1062
  []
 
-[55
+[62
 
 ]
 File: figures/representation_learning_capability.png Graphic file (type bmp)
 <figures/representation_learning_capability.png>
- [56
+ [63
 
-] [57
+] [64
 
 ]
 File: figures/distribution_shift.png Graphic file (type bmp)
 <figures/distribution_shift.png>
- [58
+ [65
 
-] [59
+] [66
 
 ]
 \tf@nav=\write6
@@ -1101,15 +1128,15 @@ File: figures/distribution_shift.png Graphic file (type bmp)
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `sample.out' has not changed.
-(rerunfilecheck)             Checksum: F11EE69AA2E4C7E9F6BB0462D8FC89F7;942.
+(rerunfilecheck)             Checksum: 1B91EB222A700C1E7DFA117DA10666AE;942.
  ) 
 Here is how much of TeX's memory you used:
- 24051 strings out of 476683
- 481248 string characters out of 5804048
+ 24166 strings out of 476683
+ 484236 string characters out of 5804048
  1856018 words of memory out of 5000000
- 43712 multiletter control sequences out of 15000+600000
- 528249 words of font info for 126 fonts, out of 8000000 for 9000
+ 43812 multiletter control sequences out of 15000+600000
+ 530194 words of font info for 135 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 128i,24n,122p,440b,752s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 128i,24n,122p,440b,728s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on sample.pdf (59 pages).
+Output written on sample.pdf (66 pages).

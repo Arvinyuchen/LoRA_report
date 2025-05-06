@@ -76,67 +76,81 @@
 \headcommand {\beamer@framepages {31}{31}}
 \headcommand {\slideentry {4}{1}{22}{32/32}{Experiments}{0}}
 \headcommand {\beamer@framepages {32}{32}}
-\headcommand {\beamer@subsectionpages {11}{32}}
-\headcommand {\beamer@subsectionentry {0}{4}{2}{33}{Text Encoder}}
-\headcommand {\slideentry {4}{2}{1}{33/33}{Text Encoder}{0}}
+\headcommand {\slideentry {4}{1}{23}{33/33}{Experiments}{0}}
 \headcommand {\beamer@framepages {33}{33}}
-\headcommand {\slideentry {4}{2}{2}{34/34}{Text Encoder}{0}}
+\headcommand {\slideentry {4}{1}{24}{34/34}{Experiments}{0}}
 \headcommand {\beamer@framepages {34}{34}}
-\headcommand {\slideentry {4}{2}{3}{35/35}{Text Encoder}{0}}
+\headcommand {\slideentry {4}{1}{25}{35/35}{Experiments}{0}}
 \headcommand {\beamer@framepages {35}{35}}
-\headcommand {\slideentry {4}{2}{4}{36/36}{Text Encoder}{0}}
+\headcommand {\slideentry {4}{1}{26}{36/36}{Experiments}{0}}
 \headcommand {\beamer@framepages {36}{36}}
-\headcommand {\slideentry {4}{2}{5}{37/37}{Text Encoder}{0}}
+\headcommand {\slideentry {4}{1}{27}{37/37}{Experiments}{0}}
 \headcommand {\beamer@framepages {37}{37}}
-\headcommand {\beamer@sectionpages {8}{37}}
-\headcommand {\beamer@subsectionpages {33}{37}}
-\headcommand {\sectionentry {5}{Training}{38}{Training}{0}}
-\headcommand {\slideentry {5}{0}{1}{38/38}{}{0}}
+\headcommand {\slideentry {4}{1}{28}{38/38}{Experiments}{0}}
 \headcommand {\beamer@framepages {38}{38}}
-\headcommand {\slideentry {5}{0}{2}{39/39}{}{0}}
+\headcommand {\slideentry {4}{1}{29}{39/39}{Experiments}{0}}
 \headcommand {\beamer@framepages {39}{39}}
-\headcommand {\slideentry {5}{0}{3}{40/40}{}{0}}
+\headcommand {\beamer@subsectionpages {11}{39}}
+\headcommand {\beamer@subsectionentry {0}{4}{2}{40}{Text Encoder}}
+\headcommand {\slideentry {4}{2}{1}{40/40}{Text Encoder}{0}}
 \headcommand {\beamer@framepages {40}{40}}
-\headcommand {\slideentry {5}{0}{4}{41/41}{}{0}}
+\headcommand {\slideentry {4}{2}{2}{41/41}{Text Encoder}{0}}
 \headcommand {\beamer@framepages {41}{41}}
-\headcommand {\slideentry {5}{0}{5}{42/42}{}{0}}
+\headcommand {\slideentry {4}{2}{3}{42/42}{Text Encoder}{0}}
 \headcommand {\beamer@framepages {42}{42}}
-\headcommand {\slideentry {5}{0}{6}{43/43}{}{0}}
+\headcommand {\slideentry {4}{2}{4}{43/43}{Text Encoder}{0}}
 \headcommand {\beamer@framepages {43}{43}}
-\headcommand {\slideentry {5}{0}{7}{44/44}{}{0}}
+\headcommand {\slideentry {4}{2}{5}{44/44}{Text Encoder}{0}}
 \headcommand {\beamer@framepages {44}{44}}
-\headcommand {\slideentry {5}{0}{8}{45/45}{}{0}}
+\headcommand {\beamer@sectionpages {8}{44}}
+\headcommand {\beamer@subsectionpages {40}{44}}
+\headcommand {\sectionentry {5}{Training}{45}{Training}{0}}
+\headcommand {\slideentry {5}{0}{1}{45/45}{}{0}}
 \headcommand {\beamer@framepages {45}{45}}
-\headcommand {\slideentry {5}{0}{9}{46/46}{}{0}}
+\headcommand {\slideentry {5}{0}{2}{46/46}{}{0}}
 \headcommand {\beamer@framepages {46}{46}}
-\headcommand {\slideentry {5}{0}{10}{47/47}{}{0}}
+\headcommand {\slideentry {5}{0}{3}{47/47}{}{0}}
 \headcommand {\beamer@framepages {47}{47}}
-\headcommand {\slideentry {5}{0}{11}{48/48}{}{0}}
+\headcommand {\slideentry {5}{0}{4}{48/48}{}{0}}
 \headcommand {\beamer@framepages {48}{48}}
-\headcommand {\slideentry {5}{0}{12}{49/49}{}{0}}
+\headcommand {\slideentry {5}{0}{5}{49/49}{}{0}}
 \headcommand {\beamer@framepages {49}{49}}
-\headcommand {\slideentry {5}{0}{13}{50/50}{}{0}}
+\headcommand {\slideentry {5}{0}{6}{50/50}{}{0}}
 \headcommand {\beamer@framepages {50}{50}}
-\headcommand {\slideentry {5}{0}{14}{51/51}{}{0}}
+\headcommand {\slideentry {5}{0}{7}{51/51}{}{0}}
 \headcommand {\beamer@framepages {51}{51}}
-\headcommand {\slideentry {5}{0}{15}{52/52}{}{0}}
+\headcommand {\slideentry {5}{0}{8}{52/52}{}{0}}
 \headcommand {\beamer@framepages {52}{52}}
-\headcommand {\slideentry {5}{0}{16}{53/53}{}{0}}
+\headcommand {\slideentry {5}{0}{9}{53/53}{}{0}}
 \headcommand {\beamer@framepages {53}{53}}
-\headcommand {\slideentry {5}{0}{17}{54/54}{}{0}}
+\headcommand {\slideentry {5}{0}{10}{54/54}{}{0}}
 \headcommand {\beamer@framepages {54}{54}}
-\headcommand {\slideentry {5}{0}{18}{55/55}{}{0}}
+\headcommand {\slideentry {5}{0}{11}{55/55}{}{0}}
 \headcommand {\beamer@framepages {55}{55}}
-\headcommand {\slideentry {5}{0}{19}{56/56}{}{0}}
+\headcommand {\slideentry {5}{0}{12}{56/56}{}{0}}
 \headcommand {\beamer@framepages {56}{56}}
-\headcommand {\slideentry {5}{0}{20}{57/57}{}{0}}
+\headcommand {\slideentry {5}{0}{13}{57/57}{}{0}}
 \headcommand {\beamer@framepages {57}{57}}
-\headcommand {\slideentry {5}{0}{21}{58/58}{}{0}}
+\headcommand {\slideentry {5}{0}{14}{58/58}{}{0}}
 \headcommand {\beamer@framepages {58}{58}}
-\headcommand {\slideentry {5}{0}{22}{59/59}{}{0}}
+\headcommand {\slideentry {5}{0}{15}{59/59}{}{0}}
 \headcommand {\beamer@framepages {59}{59}}
-\headcommand {\beamer@partpages {1}{59}}
-\headcommand {\beamer@subsectionpages {38}{59}}
-\headcommand {\beamer@sectionpages {38}{59}}
-\headcommand {\beamer@documentpages {59}}
-\headcommand {\gdef \inserttotalframenumber {59}}
+\headcommand {\slideentry {5}{0}{16}{60/60}{}{0}}
+\headcommand {\beamer@framepages {60}{60}}
+\headcommand {\slideentry {5}{0}{17}{61/61}{}{0}}
+\headcommand {\beamer@framepages {61}{61}}
+\headcommand {\slideentry {5}{0}{18}{62/62}{}{0}}
+\headcommand {\beamer@framepages {62}{62}}
+\headcommand {\slideentry {5}{0}{19}{63/63}{}{0}}
+\headcommand {\beamer@framepages {63}{63}}
+\headcommand {\slideentry {5}{0}{20}{64/64}{}{0}}
+\headcommand {\beamer@framepages {64}{64}}
+\headcommand {\slideentry {5}{0}{21}{65/65}{}{0}}
+\headcommand {\beamer@framepages {65}{65}}
+\headcommand {\slideentry {5}{0}{22}{66/66}{}{0}}
+\headcommand {\beamer@framepages {66}{66}}
+\headcommand {\beamer@partpages {1}{66}}
+\headcommand {\beamer@subsectionpages {45}{66}}
+\headcommand {\beamer@sectionpages {45}{66}}
+\headcommand {\beamer@documentpages {66}}
+\headcommand {\gdef \inserttotalframenumber {66}}

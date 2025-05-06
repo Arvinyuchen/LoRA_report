@@ -212,16 +212,6 @@
 \subsection{Experiments}
 %------------------------------------------------
 
-\begin{frame}{LoRA --- Baselines}
-    \begin{figure}
-        \centering
-        \label{LoRA_baselines}
-        \includegraphics[width=0.8 \linewidth]{figures/baselines.png}
-    \end{figure}  
-\end{frame}
-
-%------------------------------------------------
-
 \begin{frame}{General Language Understanding Evaluation (GLUE)}
     GLUE is a multitask benchmark and analysis platform for natural language understanding.
     \bigskip
@@ -278,7 +268,7 @@
 
 %------------------------------------------------
 
-\begin{frame}{Evaluation metrics --- Matthews corr. (CoLA)}
+\begin{frame}{Evaluation metrics --- Baselines cont.}
     \textbf{Adapter tuning} 
     \begin{itemize}
         \item Adapter${ }^{H}$ Two fully connected layers with biases with a nonlinearity in between.
@@ -301,6 +291,111 @@
 \end{frame}
 
 %------------------------------------------------
+\begin{frame}{LoRA --- Models}
+    \begin{itemize}
+        \item Natural Language Understanding (NLU)
+        \begin{itemize}
+            \item RoBERTa, optimised BERT
+            \begin{itemize}
+                \item pre-trained 125M base
+                \item 225M large from HuggingFace Transformers library
+            \end{itemize} 
+            \item DeBERTa XXL, variant of BERT, 1.5B
+        \end{itemize}
+        \bigskip
+        \item Natural Language Generation (NLG)
+        \begin{itemize}
+            \item GPT-2 Medium/Large 
+            \item GPT-2 175B
+        \end{itemize}
+    \end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{LoRA --- Baselines}
+    \begin{figure}
+        \centering
+        \label{LoRA_baselines}
+        \includegraphics[width=0.8 \linewidth]{figures/baselines.png}
+    \end{figure}  
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{LoRA --- Baselines}
+    \begin{figure}
+        \centering
+        \label{gpt2_fintune}
+        \includegraphics[width=0.8 \linewidth]{figures/gpt2_fintune.png}
+    \end{figure}  
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{LoRA --- Baselines}
+    \begin{figure}
+        \centering
+        \label{gpt3_finetune}
+        \includegraphics[width=0.8 \linewidth]{figures/gpt3_finetune.png}
+    \end{figure}  
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{LoRA --- Baselines}
+    \begin{figure}
+        \centering
+        \label{gpt3_performance_parameters}
+        \includegraphics[width=0.8 \linewidth]{figures/gpt3_performance_parameters.png}
+    \end{figure}  
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{LoRA --- LoRA Advantages}
+    \begin{itemize}
+        \item lowers the hardware barrier
+        \item Better interpretability of correlation between update weights and the pre-trained weights
+        \begin{itemize}
+            \item GPT-3 175B, the largest reduction of trainable parameters without adversely affecting the task performances
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{LoRA --- Understand LoRA updates}
+    
+
+    \textbf{Condition}
+    \begin{itemize}
+        \item Parameter budget constraint 18M
+        \item Limited to self -attention module
+    \end{itemize}
+    \textbf{Eval} The best downstream task performance
+
+    \textbf{Goal} Subsets of weights matrices
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}{LoRA --- Weight Matrices Selection in Transformer}
+    \begin{figure}
+        \centering
+        \label{budget_parameter}
+        \includegraphics[width=0.8 \linewidth]{figures/budget_parameter.png}
+    \end{figure} 
+    \begin{itemize}
+        \item 
+    \end{itemize} 
+\end{frame}
+
+%------------------------------------------------
+
+
+
 
 \begin{frame}{Image Encoder-Constructing Image Patches}
 
