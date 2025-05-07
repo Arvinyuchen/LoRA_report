@@ -13,24 +13,17 @@ import torchvision.transforms as T
 # -------------- Dataset ------------
 class ContrastiveCIFAR(torch.utils.data.Dataset):
     def __init__(self, cifar_ds, template="a photo of a {}"):
-        self.images  = cifar_ds.data
-        self.labels  = cifar_ds.targets       
-        self.classes = cifar_ds.classes        
+        self.cifar_ds = cifar_ds
         self.template = template
-        self.prep = T.Compose([
-            T.ToPILImage(),
-            T.Resize(224, interpolation=T.InterpolationMode.BICUBIC),
-            T.ToTensor()
-        ])
+        self.classes = cifar_ds.classes
 
     def __len__(self):
-        return len(self.labels)
+        return len(self.cifar_ds)
 
     def __getitem__(self, idx):
-        img = self.prep(self.images[idx])
-        caption = self.template.format(self.classes[self.labels[idx]])
-        caption = caption.replace('_', ' ')
-        return img, caption 
+        img, label = self.cifar_ds[idx]  # image is already preprocessed
+        caption = self.template.format(self.classes[label]).replace('_', ' ')
+        return img, caption
 
 
 
