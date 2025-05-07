@@ -63,7 +63,7 @@ class ResidualAttentionBlock(nn.Module):
         self.out_proj.bias.data.fill_(0)
 
     def attention(self, x: torch.Tensor):
-        batch_size, seq_len, _ = x.size()
+        seq_len, batch_size, _ = x.size()
 
         if self.attn_mask is not None:
             self.attn_mask = expand_mask(self.attn_mask)
@@ -78,7 +78,7 @@ class ResidualAttentionBlock(nn.Module):
             d_k = q.size()[-1]
             attn_logits = torch.matmul(q, k.transpose(-2, -1))
             attn_logits = attn_logits / math.sqrt(d_k)
-            if self.attn_mask is not None and self.attn_mask.shape[-1] == seq_len:
+            if self.attn_mask is not None:
                 attn_logits = attn_logits.masked_fill(mask == 0, -9e15)
             attention = F.softmax(attn_logits, dim=-1)
             values = torch.matmul(attention, v)
@@ -88,7 +88,7 @@ class ResidualAttentionBlock(nn.Module):
         values = values.permute(0, 2, 1, 3) # [Batch, SeqLen, Head, Dims]
         values = values.reshape(batch_size, seq_len , self.d_model)
         
-        return self.out_proj(values)
+        return self.out_proj(values).permute(1,0,2)
 
 
     def forward(self, x: torch.Tensor):
@@ -135,6 +135,7 @@ class VisionTransformer(nn.Module):
         x = x + self.positional_embedding.to(x.dtype)
         x = self.ln_pre(x)
 
+        # the reshaping caused the alignment issue
         x = x.permute(1, 0, 2)  # NLD -> LND
         x = self.transformer(x)
         x = x.permute(1, 0, 2)  # LND -> NLD
@@ -145,7 +146,6 @@ class VisionTransformer(nn.Module):
             x = x @ self.proj
 
         return x
-
 
 
 def inject_lora_into_clip(clip_model, r=4, alpha=8):
