@@ -64,6 +64,7 @@ class ResidualAttentionBlock(nn.Module):
 
     def attention(self, x: torch.Tensor):
         batch_size, seq_len, _ = x.size()
+        print(x.shape)
 
         if self.attn_mask is not None:
             self.attn_mask = expand_mask(self.attn_mask)
@@ -78,7 +79,10 @@ class ResidualAttentionBlock(nn.Module):
             d_k = q.size()[-1]
             attn_logits = torch.matmul(q, k.transpose(-2, -1))
             attn_logits = attn_logits / math.sqrt(d_k)
-            if self.attn_mask is not None and self.attn_mask.shape[-1] == seq_len:
+            print(attn_logits.shape)
+
+            if self.attn_mask is not None: #and self.attn_mask.shape[-1] == seq_len
+                print(self.attn_mask.shape)
                 attn_logits = attn_logits.masked_fill(mask == 0, -9e15)
             attention = F.softmax(attn_logits, dim=-1)
             values = torch.matmul(attention, v)
